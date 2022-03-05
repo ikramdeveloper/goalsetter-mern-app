@@ -1,3 +1,5 @@
+const path = require("path");
+
 // Environment Variables Configuration
 require("dotenv").config();
 
@@ -20,6 +22,18 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/goals", goalsRouter);
 app.use("/api/users", usersRouter);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+  app.get("*", (req, resp) => {
+    resp.sendFile(
+      path.resolve(__dirname, "..", "frontend", "build", "index.html")
+    );
+  });
+} else {
+  app.get("/", (req, resp) => resp.send("Please set to production"));
+}
 
 app.use(errorHandler);
 
